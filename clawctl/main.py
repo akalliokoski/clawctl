@@ -1,8 +1,14 @@
 """Entry point for the clawctl CLI."""
 
 import typer
+from dotenv import load_dotenv
 
 from clawctl import deploy, server, status, tunnel
+
+# Load .env / .env.production so HCLOUD_TOKEN etc. are available without
+# the user having to export them manually in every shell session.
+load_dotenv()  # .env
+load_dotenv(".env.production")  # project-specific overrides
 
 app = typer.Typer(
     name="clawctl",

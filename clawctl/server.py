@@ -1,23 +1,28 @@
 """Hetzner VPS provisioning commands."""
 
 import os
+from pathlib import Path
 
 import typer
 from hcloud import Client
+from hcloud.firewalls import FirewallResource
 from hcloud.images import Image
 from hcloud.locations import Location
 from hcloud.server_types import ServerType
+from hcloud.servers import Server
 from rich.console import Console
 from rich.table import Table
 
 app = typer.Typer(help="Hetzner server management")
 console = Console()
 
+CLOUD_INIT_PATH = Path("config/cloud-init.yaml")
+
 
 def get_client() -> Client:
     token = os.environ.get("HCLOUD_TOKEN")
     if not token:
-        typer.echo("Error: HCLOUD_TOKEN env var is not set.", err=True)
+        console.print("[red]Error: HCLOUD_TOKEN env var is not set.[/red]", highlight=False)
         raise typer.Exit(1)
     return Client(token=token)
 
@@ -30,21 +35,42 @@ def create(
     location: str = typer.Option("nbg1", help="Datacenter location (nbg1, fsn1, hel1)"),
     ssh_key: str = typer.Option("openclaw-key", help="Name of SSH key uploaded to Hetzner"),
     firewall: str = typer.Option("openclaw-fw", help="Firewall name to apply (optional)"),
+    cloud_init: str = typer.Option(
+        str(CLOUD_INIT_PATH),
+        help="Path to cloud-init YAML (pass empty string to skip)",
+    ),
 ) -> None:
     """Provision a new Hetzner VPS for OpenClaw."""
     client = get_client()
+
+    # Read cloud-init user data if provided
+    user_data = None
+    if cloud_init:
+        ci_path = Path(cloud_init)
+        if ci_path.exists():
+            user_data = ci_path.read_text()
+            console.print(f"Using cloud-init: {ci_path}")
+        else:
+            console.print(f"[yellow]Cloud-init file not found: {ci_path} — skipping.[/yellow]")
+
     with console.status(f"Provisioning [bold]{name}[/bold] ({server_type}) in {location}..."):
         key = client.ssh_keys.get_by_name(ssh_key)
         if not key:
-            console.print(f"[yellow]Warning: SSH key '{ssh_key}' not found — continuing without it.[/yellow]")
+            console.print(
+                f"[yellow]Warning: SSH key '{ssh_key}' not found — continuing without it.[/yellow]"
+            )
 
-        resp = client.servers.create(
+        create_kwargs = dict(
             name=name,
             server_type=ServerType(name=server_type),
             image=Image(name=image),
             location=Location(name=location),
             ssh_keys=[key] if key else [],
         )
+        if user_data:
+            create_kwargs["user_data"] = user_data
+
+        resp = client.servers.create(**create_kwargs)
         resp.action.wait_until_finished()
 
     ip = resp.server.public_net.ipv4.ip
@@ -53,13 +79,23 @@ def create(
     fw = client.firewalls.get_by_name(firewall)
     if fw:
         with console.status("Applying firewall..."):
-            fw.apply_to_resources([{"type": "server", "server": {"id": resp.server.id}}])
+            client.firewalls.apply_to_resources(
+                fw,
+                [FirewallResource(type="server", server=Server(id=resp.server.id))],
+            )
         console.print(f"[green]Firewall '{firewall}' applied.[/green]")
 
-    console.print("\nNext steps:")
-    console.print(f"  1. scp scripts/bootstrap-vps.sh root@{ip}:/tmp/")
-    console.print(f"  2. ssh root@{ip} 'bash /tmp/bootstrap-vps.sh'")
-    console.print(f"  3. ssh root@{ip} 'tailscale up --ssh'")
+    if user_data:
+        console.print("\nNext steps:")
+        console.print("  1. Wait ~2 min for cloud-init to finish")
+        console.print(f"  2. ssh root@{ip} 'tailscale up --ssh'")
+        console.print("  3. Approve in Tailscale admin, disable key expiry")
+        console.print("  4. clawctl deploy push")
+    else:
+        console.print("\nNext steps:")
+        console.print(f"  1. scp scripts/bootstrap-vps.sh root@{ip}:/tmp/")
+        console.print(f"  2. ssh root@{ip} 'bash /tmp/bootstrap-vps.sh'")
+        console.print(f"  3. ssh root@{ip} 'tailscale up --ssh'")
 
 
 @app.command("destroy")

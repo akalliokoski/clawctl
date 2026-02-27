@@ -5,8 +5,8 @@ services:
     image: ghcr.io/openclaw/openclaw:latest
     restart: "no"
     ports:
-      - "18789:18789"   # Expose directly for local dev
-      - "18790:18790"
+      - "127.0.0.1:18789:18789"   # Bind to localhost only, even in dev
+      - "127.0.0.1:18790:18790"
     environment:
       LOG_LEVEL: debug
     volumes:
