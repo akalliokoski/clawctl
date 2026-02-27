@@ -1,9 +1,12 @@
 """Tailscale/SSH access helpers."""
 
 import subprocess
+import webbrowser
 
 import typer
 from rich.console import Console
+
+from clawctl.ssh_utils import _validate_host
 
 app = typer.Typer(help="Access OpenClaw via Tailscale")
 console = Console()
@@ -17,10 +20,11 @@ def open_ui(
     host: str = typer.Option(DEFAULT_HOST, help="Tailscale hostname or IP"),
     port: int = typer.Option(WEB_UI_PORT, help="Web UI port"),
 ) -> None:
-    """Open the OpenClaw web UI in the default browser (macOS)."""
+    """Open the OpenClaw web UI in the default browser."""
+    _validate_host(host)
     url = f"http://{host}:{port}"
     console.print(f"Opening [link={url}]{url}[/link]")
-    subprocess.run(["open", url], check=False)  # macOS; use xdg-open on Linux
+    webbrowser.open(url)
 
 
 @app.command("ssh")
@@ -28,6 +32,7 @@ def ssh_connect(
     host: str = typer.Option(DEFAULT_HOST, help="Tailscale hostname or IP"),
 ) -> None:
     """Open an interactive SSH session to the VPS."""
+    _validate_host(host)
     subprocess.run(["ssh", host], check=False)
 
 
@@ -38,8 +43,9 @@ def port_forward(
     local_port: int = typer.Option(WEB_UI_PORT, help="Local port to bind"),
 ) -> None:
     """Set up an SSH port-forward as an alternative to Tailscale (fallback only)."""
+    _validate_host(host)
     console.print(
-        f"Forwarding localhost:{local_port} → {host}:{remote_port}\n"
+        f"Forwarding localhost:{local_port} -> {host}:{remote_port}\n"
         f"Then open: http://localhost:{local_port}"
     )
     subprocess.run(
