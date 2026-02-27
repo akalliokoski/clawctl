@@ -136,6 +136,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
+!.env.example
 .envrc
 .venv
 env/
@@ -143,6 +145,16 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# OpenClaw runtime data (pulled from VPS, never committed)
+data/
+data-dev/
+workspace/
+workspace-dev/
+backups/
+
+# macOS
+.DS_Store
 
 # Spyder project settings
 .spyderproject

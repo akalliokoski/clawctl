@@ -1,0 +1,43 @@
+{
+  "env": {
+    "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}"
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openrouter/anthropic/claude-sonnet-4-5",
+        "fallbacks": [
+          "openrouter/anthropic/claude-haiku-3-5",
+          "openrouter/google/gemini-pro-1-5"
+        ]
+      },
+      "models": {
+        "openrouter/anthropic/claude-sonnet-4-5": {},
+        "openrouter/anthropic/claude-haiku-3-5": {},
+        "openrouter/google/gemini-pro-1-5": {}
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "dmPolicy": "pairing",
+      "groups": {
+        "*": { "requireMention": true }
+      }
+    }
+  },
+  "tools": {
+    "web": {
+      "search": {
+        "provider": "brave"
+      }
+    }
+  },
+  "browser": {
+    "enabled": false,
+    "headless": true,
+    "defaultProfile": "openclaw"
+  }
+}

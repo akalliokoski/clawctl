@@ -1,0 +1,40 @@
+#cloud-config
+# Optional: pass as --user-data when creating a Hetzner server to auto-bootstrap.
+# hcloud server create ... --user-data-from-file config/cloud-init.yaml
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - ufw
+  - git
+  - htop
+
+runcmd:
+  # Docker
+  - curl -fsSL https://get.docker.com | sh
+  - systemctl enable docker
+  - systemctl start docker
+
+  # Tailscale
+  - curl -fsSL https://tailscale.com/install.sh | sh
+  # tailscale up --ssh   <- run manually after boot to authenticate
+
+  # UFW firewall
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow in on tailscale0
+  - ufw allow 22/tcp
+  - ufw --force enable
+
+  # OpenClaw directories
+  - mkdir -p /opt/openclaw/data /opt/openclaw/workspace
+  - chown -R 1000:1000 /opt/openclaw/data /opt/openclaw/workspace
+
+final_message: |
+  Bootstrap complete. Next steps:
+  1. SSH in and run: tailscale up --ssh
+  2. Approve in Tailscale admin console, disable key expiry
+  3. Upload docker-compose.yml and .env to /opt/openclaw/
+  4. Run: cd /opt/openclaw && docker compose up -d
