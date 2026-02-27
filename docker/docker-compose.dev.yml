@@ -1,0 +1,14 @@
+# Local development overrides — use with:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+services:
+  openclaw:
+    image: ghcr.io/openclaw/openclaw:latest
+    restart: "no"
+    ports:
+      - "18789:18789"   # Expose directly for local dev
+      - "18790:18790"
+    environment:
+      LOG_LEVEL: debug
+    volumes:
+      - ./data-dev:/home/node/.openclaw
+      - ./workspace-dev:/home/node/.openclaw/workspace
