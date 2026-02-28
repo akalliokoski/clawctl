@@ -5,14 +5,14 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "openrouter/anthropic/claude-sonnet-4-5",
+        "primary": "openrouter/moonshotai/kimi-k2.5",
         "fallbacks": [
           "openrouter/anthropic/claude-haiku-3-5",
           "openrouter/google/gemini-pro-1-5"
         ]
       },
       "models": {
-        "openrouter/anthropic/claude-sonnet-4-5": {},
+        "openrouter/moonshotai/kimi-k2.5": {},
         "openrouter/anthropic/claude-haiku-3-5": {},
         "openrouter/google/gemini-pro-1-5": {}
       }
