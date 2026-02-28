@@ -1,0 +1,43 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docker/**'
+      - 'config/**'
+      - 'skills/**'
+      - 'scripts/**'
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, vps]
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate config
+        run: |
+          python -c "import json; json.load(open('config/openclaw.json'))"
+          docker compose -f docker/docker-compose.yml config --quiet
+
+      - name: Sync skills
+        run: rsync -avz skills/ /opt/openclaw/data/skills/
+
+      - name: Sync config
+        run: |
+          cp config/openclaw.json /opt/openclaw/data/config.json
+          cp config/SOUL.md /opt/openclaw/data/SOUL.md || true
+          cp config/HEARTBEAT.md /opt/openclaw/data/HEARTBEAT.md || true
+
+      - name: Pull and restart container
+        run: |
+          cd /opt/openclaw
+          docker compose -f /opt/clawctl/docker/docker-compose.yml pull
+          docker compose -f /opt/clawctl/docker/docker-compose.yml up -d
+
+      - name: Health check
+        run: |
+          sleep 10
+          wget -qO- http://localhost:18789/health | grep -q '"status":"ok"'
+          echo "Health check passed"
