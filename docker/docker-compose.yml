@@ -12,6 +12,11 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       BRAVE_API_KEY: ${BRAVE_API_KEY:-}
       DISABLE_TELEMETRY: ${DISABLE_TELEMETRY:-1}
+    read_only: true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-./data}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACE_DIR:-./workspace}:/home/node/.openclaw/workspace
