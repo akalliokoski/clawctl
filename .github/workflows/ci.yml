@@ -23,4 +23,4 @@ jobs:
         run: docker compose -f docker/docker-compose.yml config --quiet
 
       - name: Validate openclaw.json
-        run: python -c "import json; json.load(open('config/openclaw.json'))"
+        run: python3 -c "import json; json.load(open('config/openclaw.json'))"

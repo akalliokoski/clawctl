@@ -18,7 +18,7 @@ jobs:
 
       - name: Validate config
         run: |
-          python -c "import json; json.load(open('config/openclaw.json'))"
+          python3 -c "import json; json.load(open('config/openclaw.json'))"
           docker compose -f docker/docker-compose.yml config --quiet
 
       - name: Sync skills
