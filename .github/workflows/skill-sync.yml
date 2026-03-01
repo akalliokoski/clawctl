@@ -7,7 +7,7 @@ on:
 
 jobs:
   sync:
-    runs-on: [self-hosted, vps]
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
         with:
