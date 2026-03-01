@@ -36,6 +36,6 @@ jobs:
 
       - name: Health check
         run: |
-          sleep 10
+          sleep 30
           wget -qO- http://localhost:18789/health | grep -q '"status":"ok"'
           echo "Health check passed"
