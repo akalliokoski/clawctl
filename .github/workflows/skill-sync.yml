@@ -2,7 +2,7 @@ name: Skill Sync
 
 on:
   schedule:
-    - cron: '0 7 * * *'    # Daily at 07:00 UTC
+    - cron: '0 6 * * *'    # Daily at 06:00 UTC = 08:00 Helsinki (EET)
   workflow_dispatch:         # Manual trigger from GitHub UI
 
 jobs:

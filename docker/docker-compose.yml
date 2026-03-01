@@ -1,6 +1,6 @@
 services:
   openclaw:
-    image: ghcr.io/openclaw/openclaw:latest
+    image: ghcr.io/openclaw/openclaw:2026.2.26
     container_name: openclaw
     restart: unless-stopped
     init: true
@@ -11,6 +11,7 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       BRAVE_API_KEY: ${BRAVE_API_KEY:-}
+      DISABLE_TELEMETRY: ${DISABLE_TELEMETRY:-1}
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-./data}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACE_DIR:-./workspace}:/home/node/.openclaw/workspace
@@ -42,7 +43,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      WATCHTOWER_POLL_INTERVAL: 86400        # Check every 24 hours
+      WATCHTOWER_SCHEDULE: "0 0 1 * * *"    # 01:00 UTC = 03:00 Helsinki (EET)
       WATCHTOWER_CLEANUP: "true"             # Remove old images after update
       WATCHTOWER_MONITOR_ONLY: "false"       # Set "true" for notification-only mode
       DOCKER_API_VERSION: "1.44"
