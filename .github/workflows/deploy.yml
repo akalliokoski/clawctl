@@ -31,7 +31,8 @@ jobs:
       - name: Pull and restart container
         run: |
           docker compose -f $GITHUB_WORKSPACE/docker/docker-compose.yml --env-file /opt/openclaw/.env pull
-          docker compose -f $GITHUB_WORKSPACE/docker/docker-compose.yml --env-file /opt/openclaw/.env up -d
+          docker rm -f openclaw watchtower 2>/dev/null || true
+          docker compose -p openclaw -f $GITHUB_WORKSPACE/docker/docker-compose.yml --env-file /opt/openclaw/.env up -d
 
       - name: Health check
         run: |
