@@ -30,9 +30,8 @@ jobs:
 
       - name: Pull and restart container
         run: |
-          cd /opt/openclaw
-          docker compose -f /opt/clawctl/docker/docker-compose.yml pull
-          docker compose -f /opt/clawctl/docker/docker-compose.yml up -d
+          docker compose -f /opt/clawctl/docker/docker-compose.yml --env-file /opt/openclaw/.env pull
+          docker compose -f /opt/clawctl/docker/docker-compose.yml --env-file /opt/openclaw/.env up -d
 
       - name: Health check
         run: |
