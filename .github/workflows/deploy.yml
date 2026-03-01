@@ -37,5 +37,7 @@ jobs:
       - name: Health check
         run: |
           sleep 30
+          docker ps
+          wget -qO- http://localhost:18789/health || echo "wget failed"
           wget -qO- http://localhost:18789/health | grep -q '"status":"ok"'
           echo "Health check passed"
