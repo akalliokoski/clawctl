@@ -40,16 +40,3 @@ services:
       options:
         max-size: "50m"
         max-file: "3"
-
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      WATCHTOWER_SCHEDULE: "0 0 1 * * *"    # 01:00 UTC = 03:00 Helsinki (EET)
-      WATCHTOWER_CLEANUP: "true"             # Remove old images after update
-      WATCHTOWER_MONITOR_ONLY: "false"       # Set "true" for notification-only mode
-      DOCKER_API_VERSION: "1.44"
-    command: openclaw                         # Only watch the openclaw container
