@@ -10,9 +10,9 @@ REPO_SKILLS="./skills"
 
 echo "=== Syncing skills from ${VPS}:${REMOTE_SKILLS} ==="
 if [ "$VPS" = "localhost" ]; then
-    rsync -av --delete "${REMOTE_SKILLS}/" "${REPO_SKILLS}/"
+    rsync -av --delete --exclude='README.md' "${REMOTE_SKILLS}/" "${REPO_SKILLS}/"
 else
-    rsync -avz --delete "root@${VPS}:${REMOTE_SKILLS}/" "${REPO_SKILLS}/"
+    rsync -avz --delete --exclude='README.md' "root@${VPS}:${REMOTE_SKILLS}/" "${REPO_SKILLS}/"
 fi
 
 # Check for any changes (tracked or untracked under skills/)
