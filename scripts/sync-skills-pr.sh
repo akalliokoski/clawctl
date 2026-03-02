@@ -9,7 +9,11 @@ BRANCH="skill-sync/$(date +%Y%m%d-%H%M%S)"
 REPO_SKILLS="./skills"
 
 echo "=== Syncing skills from ${VPS}:${REMOTE_SKILLS} ==="
-rsync -avz --delete "root@${VPS}:${REMOTE_SKILLS}/" "${REPO_SKILLS}/"
+if [ "$VPS" = "localhost" ]; then
+    rsync -av --delete "${REMOTE_SKILLS}/" "${REPO_SKILLS}/"
+else
+    rsync -avz --delete "root@${VPS}:${REMOTE_SKILLS}/" "${REPO_SKILLS}/"
+fi
 
 # Check for any changes (tracked or untracked under skills/)
 CHANGED=$(git diff --name-only "${REPO_SKILLS}/" ; git ls-files --others --exclude-standard "${REPO_SKILLS}/")
