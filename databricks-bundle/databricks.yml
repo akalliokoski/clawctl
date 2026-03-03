@@ -1,0 +1,65 @@
+bundle:
+  name: openclaw-pipelines
+  databricks_cli_version: ">= 0.218.0"
+
+# Deploy with:
+#   export DATABRICKS_HOST=https://your-workspace.azuredatabricks.net
+#   export DATABRICKS_TOKEN=dapiXXXXXX
+#   databricks bundle deploy --target dev
+#   databricks bundle run --target dev daily_etl
+
+workspace:
+  host: ${var.databricks_host}
+
+variables:
+  databricks_host:
+    description: "Databricks workspace URL (e.g. https://adb-xxx.azuredatabricks.net)"
+    default: ""
+  catalog:
+    description: "Unity Catalog catalog name"
+    default: "dev_catalog"
+  schema:
+    description: "Unity Catalog schema name"
+    default: "openclaw_data"
+
+resources:
+  pipelines:
+    openclaw_medallion:
+      name: "OpenClaw Medallion ETL"
+      serverless: true
+      catalog: ${var.catalog}
+      target: ${var.schema}
+      libraries:
+        - file:
+            path: ./src/ingest_sessions.py
+        - file:
+            path: ./src/build_analytics.py
+      configuration:
+        catalog: ${var.catalog}
+        schema: ${var.schema}
+      continuous: false
+
+  jobs:
+    daily_etl:
+      name: "OpenClaw Daily ETL"
+      # Runs at 06:00 UTC daily — after the VPS cron upload at 03:00 UTC
+      schedule:
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: "UTC"
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: run_medallion_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.openclaw_medallion.id}
+      email_notifications:
+        on_failure: []
+
+targets:
+  dev:
+    default: true
+    mode: development
+
+  prod:
+    mode: production
+    workspace:
+      host: ${var.databricks_host}

@@ -3,7 +3,7 @@
 import typer
 from dotenv import load_dotenv
 
-from clawctl import deploy, server, status, tunnel
+from clawctl import databricks, deploy, server, status, tunnel
 
 # Load .env / .env.production so HCLOUD_TOKEN etc. are available without
 # the user having to export them manually in every shell session.
@@ -20,6 +20,7 @@ app.add_typer(server.app, name="server")
 app.add_typer(deploy.app, name="deploy")
 app.add_typer(status.app, name="status")
 app.add_typer(tunnel.app, name="tunnel")
+app.add_typer(databricks.app, name="databricks")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,9 @@
+# Terraform state and provider cache — never commit these
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Variable files with real values — use *.tfvars.example for templates
+*.tfvars
+
+# Commit .terraform.lock.hcl to ensure reproducible provider versions
