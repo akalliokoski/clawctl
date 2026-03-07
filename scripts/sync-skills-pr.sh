@@ -4,7 +4,7 @@
 set -euo pipefail
 
 VPS="${VPS_HOST:-openclaw-vps}"
-REMOTE_SKILLS="/opt/openclaw/data/skills"
+REMOTE_SKILLS="/opt/openclaw/workspace/skills"
 BRANCH="skill-sync/$(date +%Y%m%d-%H%M%S)"
 REPO_SKILLS="./skills"
 

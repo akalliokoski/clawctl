@@ -20,7 +20,7 @@ jobs:
         run: python3 -c "import json; json.load(open('config/openclaw.json'))"
 
       - name: Sync skills
-        run: rsync -avz skills/ /opt/openclaw/data/skills/
+        run: rsync -avz skills/ /opt/openclaw/workspace/skills/
 
       - name: Sync config
         run: |

@@ -56,7 +56,7 @@ Before approving a skill PR, check:
 
 ```bash
 # Sync skills/ directory to VPS
-rsync -avz skills/ root@openclaw-vps:/opt/openclaw/data/skills/
+rsync -avz skills/ root@openclaw-vps:/opt/openclaw/workspace/skills/
 
 # Restart to pick up new skills
 clawctl deploy restart
